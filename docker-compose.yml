@@ -7,8 +7,6 @@ services:
       - USER_UID=1000
       - USER_GID=1000
     restart: always
-    networks:
-      - gitea
     volumes:
       - ./volumes/gitea:/data
       - /etc/timezone:/etc/timezone:ro
@@ -16,4 +14,15 @@ services:
     ports:
       - "3000:3000"
       - "222:22"
-
+  keycloak:
+    restart: unless-stopped
+    build:
+      context: ./keycloak/
+      dockerfile: Dockerfile
+    image: gitea.simcop2387.info/simcop2387/keycloak-perl-social
+  postgres:
+    build:
+      context: ./postgresql/
+      dockerfile: Dockerfile
+    volumes:
+      - ./volumes/postgresql/data:/var/lib/postgresql/data
