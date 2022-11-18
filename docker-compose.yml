@@ -1,12 +1,21 @@
 version: "3.8"
 services:
+  postgres:
+    env_file: .env
+    build:
+      context: ./postgresql/
+      dockerfile: Dockerfile
+    volumes:
+      - ./volumes/postgresql/data:/var/lib/postgresql/data
+    restart: unless-stopped
   gitea:
     image: gitea/gitea:1.17
     container_name: gitea
+    env_file: .env
     environment:
       - USER_UID=1000
       - USER_GID=1000
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./volumes/gitea:/data
       - /etc/timezone:/etc/timezone:ro
@@ -14,19 +23,19 @@ services:
     ports:
       - "3000:3000"
       - "222:22"
+    depends_on:
+      - postgres
   keycloak:
     restart: unless-stopped
+    env_file: .env
     build:
       context: ./keycloak/
       dockerfile: Dockerfile
     image: gitea.simcop2387.info/simcop2387/keycloak-perl-social
-  postgres:
-    build:
-      context: ./postgresql/
-      dockerfile: Dockerfile
-    volumes:
-      - ./volumes/postgresql/data:/var/lib/postgresql/data
+    depends_on:
+      - postgres
   gotosocial:
+    env_file: .env
     build:
       context: ./gotosocial/
       dockerfile: Dockerfile
@@ -44,4 +53,6 @@ services:
       #- "80:80"
     volumes:
       - ./volumes/gotosocial/data:/gotosocial/storage
-    restart: "always"
+    restart: unless-stopped
+    depends_on:
+      - postgres

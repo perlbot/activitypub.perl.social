@@ -15,7 +15,7 @@ EOSQL
 }
 
 
-for $DATABASE in PG_DATABASE_LIST; do
+for DATABASE in $PG_DATABASE_LIST; do
 	uservar="PG_DB_USER_${DATABASE}"
 	passvar="PG_DB_PASS_${DATABASE}"
 	echo Creating Database $DATABASE and User ${!uservar}
