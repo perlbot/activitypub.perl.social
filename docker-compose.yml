@@ -26,3 +26,13 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./volumes/postgresql/data:/var/lib/postgresql/data
+  gotosocial:
+    image: superseriousbusiness/gotosocial:latest
+    container_name: gotosocial
+    user: 1000:1000
+    ports:
+      - "443:8080"
+      #- "80:80"
+    volumes:
+      - ./volumes/gotosocial/data:/gotosocial/storage
+    restart: "always"
