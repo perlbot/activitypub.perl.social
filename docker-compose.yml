@@ -13,7 +13,6 @@ services:
       - 5432
   gitea:
     image: gitea/gitea:1.17
-    container_name: gitea
     env_file: .env
     environment:
       - USER_UID=1000
