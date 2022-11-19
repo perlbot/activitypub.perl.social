@@ -38,8 +38,6 @@ services:
     image: gitea.simcop2387.info/simcop2387/keycloak-perl-social
     depends_on:
       - postgres
-    ports:
-      - 8443:8443
   gotosocial:
     env_file: .env
     image: gitea.simcop2387.info/simcop2387/gotosocial-perl-social
@@ -55,9 +53,6 @@ services:
         - GTS_DB_DATABASE=$GTS_DB_DATABASE
     container_name: gotosocial
     user: 1000:1000
-    ports:
-      - "8444:8443"
-      #- "80:80"
     volumes:
       - ./volumes/gotosocial/data:/gotosocial/storage
     restart: unless-stopped
@@ -84,4 +79,13 @@ services:
       - ./caddy/config/:/config
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile
       - ./volumes/caddy/data:/data
+    restart: unless-stopped
     env_file: .env
+  pinafore:
+    restart: unless-stopped
+    build:
+      context: ./pinafore/
+      dockerfile: Dockerfile
+    image: pinafore:latest
+#    ports:
+#      - 4002:4002
