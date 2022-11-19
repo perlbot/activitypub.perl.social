@@ -71,3 +71,17 @@ services:
       - ./postfix/certs:/ssl_certs
       - ./postfix/dkim:/dkim_keys
     env_file: .env.postfix
+  caddy:
+    image: gitea.simcop2387.info/simcop2387/caddy-perl-social
+    build:
+      context: ./caddy/
+      dockerfile: Dockerfile
+    ports:
+      # TODO make these right for deployment
+      - 8443:443
+      - 8080:80
+    volumes:
+      - ./caddy/config/:/config
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./volumes/caddy/data:/data
+    env_file: .env
