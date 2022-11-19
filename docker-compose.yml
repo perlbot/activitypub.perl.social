@@ -28,6 +28,7 @@ services:
       - "2222:22"
     depends_on:
       - postgres
+      - smtp
   keycloak:
     restart: unless-stopped
     env_file: .env
@@ -36,26 +37,6 @@ services:
       context: ./keycloak/
       dockerfile: Dockerfile
     image: gitea.simcop2387.info/simcop2387/keycloak-perl-social
-    depends_on:
-      - postgres
-  gotosocial:
-    env_file: .env
-    image: gitea.simcop2387.info/simcop2387/gotosocial-perl-social
-    build:
-      context: ./gotosocial/
-      dockerfile: Dockerfile
-      args:
-        - GTS_DB_TYPE=$GTS_DB_TYPE
-        - GTS_DB_ADDRESS=$GTS_DB_ADDRESS
-        - GTS_DB_PORT=$GTS_DB_PORT
-        - GTS_DB_USER=$GTS_DB_USER
-        - GTS_DB_PASSWORD=$GTS_DB_PASSWORD
-        - GTS_DB_DATABASE=$GTS_DB_DATABASE
-    container_name: gotosocial
-    user: 1000:1000
-    volumes:
-      - ./volumes/gotosocial/data:/gotosocial/storage
-    restart: unless-stopped
     depends_on:
       - postgres
   smtp:
@@ -81,11 +62,28 @@ services:
       - ./volumes/caddy/data:/data
     restart: unless-stopped
     env_file: .env
-  pinafore:
+    depends_on:
+      - keycloak
+      - friendica
+      - gitea
+  mariadb:
+    image: mariadb:10
     restart: unless-stopped
-    build:
-      context: ./pinafore/
-      dockerfile: Dockerfile
-    image: pinafore:latest
-#    ports:
-#      - 4002:4002
+    env_file: .env
+  friendica:
+    image: friendica:latest
+    restart: unless-stopped
+    volumes:
+      - ./volumes/friendica:/var/www/html
+    env_file: .env
+    depends_on:
+      - mariadb
+      - redis
+      - smtp
+  redis:
+    image: redis:7.0
+    restart: unless-stopped
+    command: redis-server --save 20 1 --loglevel warning --requirepass $REDIS_PW
+    volumes: 
+      - ./volumes/redis/:/data
+    env_file: .env

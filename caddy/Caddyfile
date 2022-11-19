@@ -29,7 +29,7 @@ perl.social {
   encode zstd gzip
 
   reverse_proxy {
-    to http://gotosocial:8080
+    to http://friendica
   }
 
   tls simcop2387@simcop2387.info { 
@@ -38,28 +38,41 @@ perl.social {
 	}
 }
 
-pinafore.perl.social {
-  encode zstd gzip
-
-  reverse_proxy {
-    to http://pinafore:4002
-  }
-  
-  tls simcop2387@simcop2387.info { 
-	  dns cloudflare {env.CLOUDFLARE_API_TOKEN}
-    resolvers 1.1.1.1
-	}
-}
-
-gts.perl.social {
-  encode zstd gzip
-
-  reverse_proxy {
-    to http://gotosocial:8080
-  }
-
-  tls simcop2387@simcop2387.info { 
-	  dns cloudflare {env.CLOUDFLARE_API_TOKEN}
-    resolvers 1.1.1.1
-	}
-}
+## perl.social {
+##   encode zstd gzip
+## 
+##   reverse_proxy {
+##     to http://gotosocial:8080
+##   }
+## 
+##   tls simcop2387@simcop2387.info { 
+## 	  dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+##     resolvers 1.1.1.1
+## 	}
+## }
+## 
+## pinafore.perl.social {
+##   encode zstd gzip
+## 
+##   reverse_proxy {
+##     to http://pinafore:4002
+##   }
+##   
+##   tls simcop2387@simcop2387.info { 
+## 	  dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+##     resolvers 1.1.1.1
+## 	}
+## }
+## 
+## gts.perl.social {
+##   encode zstd gzip
+## 
+##   reverse_proxy {
+##     to http://gotosocial:8080
+##   }
+## 
+##   tls simcop2387@simcop2387.info { 
+## 	  dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+##     resolvers 1.1.1.1
+## 	}
+## }
