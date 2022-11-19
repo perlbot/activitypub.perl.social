@@ -69,6 +69,8 @@ services:
     image: mariadb:10
     restart: unless-stopped
     env_file: .env
+    volumes:
+      - ./volumes/mariadb:/var/lib/mysql
   friendica:
     image: friendica:latest
     restart: unless-stopped
@@ -76,6 +78,18 @@ services:
       - ./volumes/friendica:/var/www/html
     env_file: .env
     depends_on:
+      - mariadb
+      - redis
+      - smtp
+  cron:
+    image: friendica:latest
+    restart: always
+    volumes:
+      - ./volumes/friendica:/var/www/html
+    entrypoint: /cron.sh
+    env_file: .env
+    depends_on:
+      - friendica
       - mariadb
       - redis
       - smtp
