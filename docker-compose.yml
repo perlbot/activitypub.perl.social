@@ -10,7 +10,7 @@ services:
       - ./volumes/postgresql/data:/var/lib/postgresql/data
     restart: unless-stopped
     ports:
-      - 5432
+      - 127.0.0.1:5432:5432
   gitea:
     image: gitea/gitea:1.17
     env_file: .env
@@ -23,15 +23,15 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     ports:
-      - "3000:3000"
-      - "2222:22"
+      - 127.0.0.1:3000:3000
+      - 22:22
     depends_on:
       - postgres
       - smtp
   keycloak:
     restart: unless-stopped
     env_file: .env
-    command: start --db=postgres
+    command: start --db=postgres --https-port=443
     build:
       context: ./keycloak/
       dockerfile: Dockerfile
@@ -53,8 +53,8 @@ services:
       dockerfile: Dockerfile
     ports:
       # TODO make these right for deployment
-      - 8443:443
-      - 8080:80
+      - 443:443
+      - 80:80
     volumes:
       - ./caddy/config/:/config
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile

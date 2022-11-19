@@ -9,10 +9,8 @@ gitea.perl.social {
 
 kc.perl.social {
   encode zstd gzip
-	reverse_proxy https://keycloak:8443
-
 	reverse_proxy {
-		to https://keycloak:8443
+		to https://keycloak:443
 		transport http {
 			tls
 			tls_insecure_skip_verify
@@ -21,11 +19,11 @@ kc.perl.social {
 
 	tls simcop2387@simcop2387.info { 
 	  dns cloudflare {env.CLOUDFLARE_API_TOKEN}
-    resolvers 1.1.1.1
+	  resolvers 1.1.1.1
 	}
 }
 
-perl.social {
+perl.social, www.perl.social {
   encode zstd gzip
 
   reverse_proxy {
