@@ -2,6 +2,7 @@ version: "3.8"
 services:
   postgres:
     env_file: .env
+    image: gitea.simcop2387.info/simcop2387/postgres-perl-social
     build:
       context: ./postgresql/
       dockerfile: Dockerfile
@@ -22,12 +23,13 @@ services:
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "3000:3000"
-      - "222:22"
+      - "2222:22"
     depends_on:
       - postgres
   keycloak:
     restart: unless-stopped
     env_file: .env
+    command: start --db=postgres
     build:
       context: ./keycloak/
       dockerfile: Dockerfile
@@ -36,6 +38,7 @@ services:
       - postgres
   gotosocial:
     env_file: .env
+    image: gitea.simcop2387.info/simcop2387/gotosocial-perl-social
     build:
       context: ./gotosocial/
       dockerfile: Dockerfile
@@ -49,10 +52,18 @@ services:
     container_name: gotosocial
     user: 1000:1000
     ports:
-      - "443:8080"
+      - "8443:8443"
       #- "80:80"
     volumes:
       - ./volumes/gotosocial/data:/gotosocial/storage
     restart: unless-stopped
     depends_on:
       - postgres
+  smtp:
+  # TODO, full system for local admin stuff?
+    image: takeyamajp/postfix
+    ports: []
+    volumes:
+      - ./postfix/certs:/ssl_certs
+      - ./postfix/dkim:/dkim_keys
+    env_file: .env.postfix
