@@ -31,20 +31,25 @@ services:
   keycloak:
     restart: unless-stopped
     env_file: .env
-    command: start --db=postgres --https-port=443
+    command: start --db=postgres --https-port=443 --log-level=debug
     build:
       context: ./keycloak/
       dockerfile: Dockerfile
     image: gitea.simcop2387.info/simcop2387/keycloak-perl-social
+    links:
+      - smtp:smtp.perl.social
     depends_on:
       - postgres
+      - smtp
   smtp:
   # TODO, full system for local admin stuff?
-    image: takeyamajp/postfix
-    ports: []
+  # image: takeyamajp/postfix
+    build:
+      context: ./postfix
+      dockerfile: Dockerfile
     volumes:
-      - ./postfix/certs:/ssl_certs
-      - ./postfix/dkim:/dkim_keys
+      - ./volumes/postfix/certs:/ssl_certs
+      - ./volumes/postfix/dkim:/dkim_keys
     env_file: .env.postfix
   caddy:
     image: gitea.simcop2387.info/simcop2387/caddy-perl-social
