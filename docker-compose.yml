@@ -2,7 +2,7 @@ version: "3.8"
 services:
   postgres:
     env_file: .env
-    image: gitea.simcop2387.info/simcop2387/postgres-perl-social
+    image: gitea.perl.social/simcop2387/postgres-perl-social
     build:
       context: ./postgresql/
       dockerfile: Dockerfile
@@ -12,7 +12,7 @@ services:
     ports:
       - 127.0.0.1:5432:5432
   gitea:
-    image: gitea/gitea:1.17
+    image: gitea/gitea:1.19
     env_file: .env
     environment:
       - USER_UID=1000
@@ -31,11 +31,10 @@ services:
   keycloak:
     restart: unless-stopped
     env_file: .env
-    command: start --db=postgres --https-port=443 --log-level=debug
+    command: start --db=postgres --https-port=443 --features=preview
     build:
       context: ./keycloak/
       dockerfile: Dockerfile
-    image: gitea.simcop2387.info/simcop2387/keycloak-perl-social
     links:
       - smtp:smtp.perl.social
     depends_on:
@@ -52,7 +51,7 @@ services:
       - ./volumes/postfix/dkim:/dkim_keys
     env_file: .env.postfix
   caddy:
-    image: gitea.simcop2387.info/simcop2387/caddy-perl-social
+    image: gitea.perl.social/simcop2387/caddy-perl-social
     build:
       context: ./caddy/
       dockerfile: Dockerfile
@@ -70,6 +69,9 @@ services:
       - keycloak
       - friendica
       - gitea
+    networks:
+      - default
+      - internal
   mariadb:
     image: mariadb:10
     restart: unless-stopped
@@ -77,20 +79,24 @@ services:
     volumes:
       - ./volumes/mariadb:/var/lib/mysql
   friendica:
-    image: friendica:latest
+    image: friendica:stable
     restart: unless-stopped
     volumes:
       - ./volumes/friendica:/var/www/html
+      - ./addons/samlperlsocial:/var/www/html/addon/samlperlsocial:ro
+      - ./themes/frio_perl_social:/var/www/html/view/theme/frio:ro
     env_file: .env
     depends_on:
       - mariadb
       - redis
       - smtp
   cron:
-    image: friendica:latest
+    image: friendica:stable
     restart: always
     volumes:
       - ./volumes/friendica:/var/www/html
+      - ./addons/samlperlsocial:/var/www/html/addon/samlperlsocial:ro
+      - ./themes/frio_perl_social:/var/www/html/view/theme/frio:ro
     entrypoint: /cron.sh
     env_file: .env
     depends_on:
@@ -105,3 +111,7 @@ services:
     volumes: 
       - ./volumes/redis/:/data
     env_file: .env
+
+networks:
+  internal:
+    driver: bridge
