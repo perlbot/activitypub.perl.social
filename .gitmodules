@@ -1,3 +1,9 @@
 [submodule "caddy"]
 	path = caddy
 	url = git@gitea.perl.social:perl.social/caddy.git
+[submodule "addons"]
+	path = addons
+	url = ./addons
+[submodule "themes"]
+	path = themes
+	url = ./themes
