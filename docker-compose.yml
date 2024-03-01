@@ -2,13 +2,13 @@ version: "3.8"
 services:
   postgres:
     env_file: .env
-    image: gitea.perl.social/simcop2387/postgres-perl-social
+    image: gitea.perl.social/perl.social/postgres-perl-social
     build:
       context: ./postgresql/
       dockerfile: Dockerfile
     volumes:
       - ./volumes/postgresql/data:/var/lib/postgresql/data
-    restart: unless-stopped
+    restart: always
     ports:
       - 127.0.0.1:5432:5432
   gitea:
@@ -17,7 +17,7 @@ services:
     environment:
       - USER_UID=1000
       - USER_GID=1000
-    restart: unless-stopped
+    restart: always
     volumes:
       - ./volumes/gitea:/data
       - /etc/timezone:/etc/timezone:ro
@@ -29,7 +29,8 @@ services:
       - postgres
       - smtp
   keycloak:
-    restart: unless-stopped
+    restart: always
+    image: gitea.perl.social/perl.social/keycloak-build
     env_file: .env
     command: start --db=postgres --https-port=443 --features=preview
     build:
@@ -51,7 +52,7 @@ services:
       - ./volumes/postfix/dkim:/dkim_keys
     env_file: .env.postfix
   caddy:
-    image: gitea.perl.social/simcop2387/caddy-perl-social
+    image: gitea.perl.social/perl.social/caddy-perl-social
     build:
       context: ./caddy/
       dockerfile: Dockerfile
@@ -63,7 +64,7 @@ services:
       - ./caddy/config/:/config
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile
       - ./volumes/caddy/data:/data
-    restart: unless-stopped
+    restart: always
     env_file: .env
     depends_on:
       - keycloak
@@ -74,13 +75,13 @@ services:
       - internal
   mariadb:
     image: mariadb:10
-    restart: unless-stopped
+    restart: always
     env_file: .env
     volumes:
       - ./volumes/mariadb:/var/lib/mysql
   friendica:
     image: friendica:stable
-    restart: unless-stopped
+    restart: always
     volumes:
       - ./volumes/friendica:/var/www/html
       - ./addons/samlperlsocial:/var/www/html/addon/samlperlsocial:ro
@@ -106,7 +107,7 @@ services:
       - smtp
   redis:
     image: redis:7.0
-    restart: unless-stopped
+    restart: always
     command: redis-server --save 20 1 --loglevel warning --requirepass $REDIS_PW
     volumes: 
       - ./volumes/redis/:/data
